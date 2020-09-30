@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree</title>
+</head>
+<body>
+    <h1>Recursive Tree</h1>
+    <canvas id="myCanvas" width="1500" height="700" style="border:1px solid #000000;">
+    </canvas>
+    <div>
+        <label id="degree_slider_label">Branch angle: 20</label><br>
+        <input type="range" min="1" max="40" value="20" id="degree_slider">
+    </div>
+    
+</body>
+</html>
+<script>
+
+    const trunk_length = 150;
+    const branch_starting_length = 100;
+
+    const degree_slider = document.getElementById("degree_slider");
+    
+    const cv = document.getElementById("myCanvas");
+    const c2 = cv.getContext("2d");
+
+    var deg = parseInt(degree_slider.value,10);
+    tree_helper(branch_starting_length, deg);
+
+    function tree_helper(length, degree){
+        //Trunk
+        c2.beginPath();
+        c2.moveTo(cv.width/2, cv.height);
+        c2.lineTo(cv.width/2, cv.height-trunk_length);
+
+        //Tree
+        tree(cv.width/2, cv.height-trunk_length, length, degree);
+        tree(cv.width/2, cv.height-trunk_length, length, -degree);
+        c2.stroke();
+    }
+
+    degree_slider.oninput = function() {
+        c2.clearRect(0, 0, cv.width, cv.height);
+        deg = parseInt(degree_slider.value,10);
+        document.getElementById("degree_slider_label").innerHTML = "Branch angle: "+deg 
+        tree_helper(branch_starting_length, deg);
+    }
+
+    function tree(x, y, length, degree){
+        var newPos = drawDegree(x,y,length,degree);
+        length -= branch_starting_length/10;
+        if(length>1){
+            tree(newPos[0], newPos[1], length, degree+deg);
+            tree(newPos[0], newPos[1], length, degree-deg);
+        }
+    }
+
+    function drawDegree(x, y, c, alpha){
+        var beta = 90-alpha;
+
+        var a = Math.sin(alpha*Math.PI/180)*c;
+        var b = Math.sin(beta*Math.PI/180)*c;
+
+        c2.moveTo(x,y);
+        c2.lineTo(x-a, y-b);
+
+        return [x-a, y-b];
+    }
+</script>
